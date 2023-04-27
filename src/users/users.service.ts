@@ -2,7 +2,8 @@ import { Injectable } from '@nestjs/common';
 import { CreateUserDto } from './dto/create-user.dto';
 import { InjectRepository } from '@nestjs/typeorm';
 import { UserEntity } from './entities/user.entity';
-import { ObjectId, Repository } from 'typeorm';
+import { Repository } from 'typeorm';
+import { ObjectId } from 'mongodb';
 
 @Injectable()
 export class UsersService {
@@ -18,9 +19,8 @@ export class UsersService {
   }
 
   async findById(_id: ObjectId) {
-    return this.repository.findOneBy({
-      _id,
-    });
+    const objectId = new ObjectId(_id);
+    return this.repository.findOne({ where: { _id: objectId } });
   }
 
   create(dto: CreateUserDto) {

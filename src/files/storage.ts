@@ -9,10 +9,10 @@ const generateId = () =>
 const normalizeFileName = (req, file, callback) => {
   const fileExtName = file.originalname.split('.').pop();
   callback(null, `${generateId()}.${fileExtName}`);
-  console.log(`${generateId()}.${fileExtName}`);
 };
 
+export const destination = './uploads';
 export const fileStorage = diskStorage({
-  destination: './uploads',
+  destination,
   filename: normalizeFileName,
 });

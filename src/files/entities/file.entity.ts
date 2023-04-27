@@ -1,16 +1,15 @@
+import { ObjectId } from 'mongodb';
 import { UserEntity } from 'src/users/entities/user.entity';
-import {
-  Column,
-  DeleteDateColumn,
-  Entity,
-  ManyToMany,
-  PrimaryGeneratedColumn,
-} from 'typeorm';
+import { Column, Entity, ManyToMany, ObjectIdColumn } from 'typeorm';
+
+export enum FileType {
+  PHOTOS = 'photos',
+}
 
 @Entity('files')
 export class FileEntity {
-  @PrimaryGeneratedColumn()
-  id: string;
+  @ObjectIdColumn()
+  _id: ObjectId;
 
   @Column()
   filename: string;
@@ -26,7 +25,4 @@ export class FileEntity {
 
   @ManyToMany(() => UserEntity, (user) => user.files)
   user: UserEntity;
-
-  @DeleteDateColumn()
-  deletedAt?: Date;
 }
