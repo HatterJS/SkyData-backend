@@ -18,6 +18,7 @@ import { JwtAuthGuard } from 'src/auth/guards/jwt.guard';
 import { UserId } from 'src/decorators/user-id.decorator';
 import { ObjectId } from 'mongodb';
 import { FileType } from './entities/file.entity';
+import * as iconv from 'iconv-lite';
 
 @Controller('files')
 @ApiTags('files')
@@ -58,6 +59,11 @@ export class FilesController {
     file: Express.Multer.File,
     @UserId() userId: ObjectId,
   ) {
+    const fixedOriginalName = iconv.decode(
+      Buffer.from(file.originalname, 'binary'),
+      'utf8',
+    );
+    file.originalname = fixedOriginalName;
     return this.filesService.create(file, userId);
   }
 

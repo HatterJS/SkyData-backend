@@ -13,7 +13,6 @@ export class AuthService {
 
   async validateUser(email: string, pass: string): Promise<any> {
     const user = await this.usersService.findByEmail(email);
-    console.log(user);
     if (user && user.password === pass) {
       const { password, ...result } = user;
       return result;
@@ -28,7 +27,6 @@ export class AuthService {
         token: this.jwtService.sign({ _id: userData._id }),
       };
     } catch (err) {
-      console.log(err);
       throw new ForbiddenException('Помилка реєстрації.');
     }
   }
