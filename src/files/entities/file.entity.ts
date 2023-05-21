@@ -4,6 +4,7 @@ import { Column, Entity, ManyToMany, ObjectIdColumn } from 'typeorm';
 
 export enum FileType {
   PHOTOS = 'photos',
+  NOPHOTOS = 'nophotos',
 }
 
 @Entity('files')

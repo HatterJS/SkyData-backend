@@ -20,9 +20,15 @@ export class FilesService {
       },
     };
 
-    // if (fileType === FileType.PHOTOS) {
-    //   findOptions.where.mimetype = { $regex: /^image/, $options: 'i' };
-    // }
+    if (fileType === FileType.PHOTOS) {
+      findOptions.where.mimetype = { $regex: /^image/, $options: 'i' };
+    }
+
+    if (fileType === FileType.NOPHOTOS) {
+      findOptions.where.mimetype = {
+        $not: { $regex: /^image/, $options: 'i' },
+      };
+    }
 
     return this.repository.find(findOptions);
   }
@@ -37,18 +43,18 @@ export class FilesService {
     });
   }
 
-  async remove(userId: ObjectId, ids: string) {
-    const idsArray = ids.split(',').map((_id) => new ObjectId(_id));
-    const filesToDelete = await this.repository.find({
-      _id: { $in: idsArray },
+  async remove(userId: ObjectId, id: string) {
+    const _id = new ObjectId(id);
+    const fileToDelete = await this.repository.find({
+      _id,
       'user._id': userId,
     });
-    const deleteResult = await this.repository.deleteMany({
-      _id: { $in: idsArray },
+    const deleteResult = await this.repository.deleteOne({
+      _id,
       'user._id': userId,
     });
 
-    filesToDelete.forEach((file) => {
+    fileToDelete.forEach((file) => {
       fs.unlink(`${destination}/${file.filename}`, (err) => {
         if (err) {
           console.error(`Failed to delete file "${file.filename}": ${err}`);

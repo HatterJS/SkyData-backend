@@ -68,7 +68,7 @@ export class FilesController {
   }
 
   @Delete()
-  remove(@UserId() userId: ObjectId, @Query('id') ids: string) {
-    return this.filesService.remove(userId, ids);
+  remove(@UserId() userId: ObjectId, @Query('id') id: string) {
+    return this.filesService.remove(userId, id);
   }
 }
