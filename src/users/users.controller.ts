@@ -3,7 +3,7 @@ import { UsersService } from './users.service';
 import { ApiBearerAuth, ApiTags } from '@nestjs/swagger';
 import { JwtAuthGuard } from 'src/auth/guards/jwt.guard';
 import { UserId } from 'src/decorators/user-id.decorator';
-import { ObjectId } from 'typeorm';
+import { Types } from 'mongoose';
 
 @Controller('users')
 @ApiTags('users')
@@ -13,7 +13,7 @@ export class UsersController {
 
   @Get('/me')
   @UseGuards(JwtAuthGuard)
-  getMe(@UserId() _id: ObjectId) {
-    return this.usersService.findById(_id);
+  getMe(@UserId() id: Types.ObjectId) {
+    return this.usersService.findById(id.toString());
   }
 }

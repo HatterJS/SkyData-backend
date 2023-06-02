@@ -32,8 +32,9 @@ export class AuthService {
   }
 
   async login(user: UserEntity) {
+    const userWithDoc = user as UserEntity & { _doc: any };
     return {
-      token: this.jwtService.sign({ _id: user._id }),
+      token: this.jwtService.sign({ _id: userWithDoc._doc._id }),
     };
   }
 }
