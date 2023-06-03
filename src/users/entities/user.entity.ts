@@ -30,11 +30,35 @@ export class UserEntity {
   @Prop({ type: Boolean, default: false })
   isConfirmed: boolean;
 
+  @Prop({
+    type: {
+      images: { type: Number, default: 0 },
+      documents: { type: Number, default: 0 },
+      total: { type: Number, default: 0 },
+    },
+    default: {
+      images: 0,
+      documents: 0,
+      total: 0,
+    },
+  })
+  usedSpace: {
+    images: number;
+    documents: number;
+    total: number;
+  };
+
   @Prop({ type: Types.ObjectId, ref: 'FileEntity' })
   files: Types.ObjectId[];
 
   @Prop({ type: Types.ObjectId, auto: true })
   id: Types.ObjectId;
+
+  @Prop({ type: Date, default: Date.now })
+  createdAt: Date;
+
+  @Prop({ type: Date, default: Date.now })
+  updatedAt: Date;
 }
 
 export const UserSchema = SchemaFactory.createForClass(UserEntity);

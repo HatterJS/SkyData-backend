@@ -1,16 +1,20 @@
-import { Injectable } from '@nestjs/common';
+import { ForbiddenException, Injectable } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
 import { Model } from 'mongoose';
 import { FileEntity, FileType, FileDocument } from './entities/file.entity';
 import { ObjectId } from 'mongodb';
 import * as fs from 'fs';
 import { destination } from './storage';
+import { UserDocument, UserEntity } from 'src/users/entities/user.entity';
 
 @Injectable()
 export class FilesService {
   constructor(
     @InjectModel(FileEntity.name)
     private fileModel: Model<FileDocument>,
+
+    @InjectModel(UserEntity.name)
+    private userModel: Model<UserDocument>,
   ) {}
 
   async findAll(userId: ObjectId, fileType: FileType) {
@@ -27,7 +31,6 @@ export class FilesService {
         $not: { $regex: /^image/, $options: 'i' },
       };
     }
-
     return this.fileModel.find(findOptions).exec();
   }
 
@@ -39,6 +42,18 @@ export class FilesService {
       mimetype: file.mimetype,
       user: userId,
     });
+    //increase size of used space
+    const user = await this.userModel.findById(userId);
+    user.usedSpace.total += file.size;
+    if (user.usedSpace.total > user.maxSize * 10 ** 9)
+      throw new ForbiddenException('Ви перевищили доступний простір хмарки');
+
+    if (/^image/.test(file.mimetype)) {
+      user.usedSpace.images += file.size;
+    } else {
+      user.usedSpace.documents += file.size;
+    }
+    user.save();
 
     return newFile.save();
   }
@@ -71,6 +86,18 @@ export class FilesService {
         console.log(`Successfully deleted file "${fileToDelete.filename}"`);
       }
     });
+    //reduce size of used space
+    const user = await this.userModel.findById(userId);
+    user.usedSpace.total -= fileToDelete.size;
+    user.usedSpace.total < 0 && (user.usedSpace.total = 0);
+    if (/^image/.test(fileToDelete.mimetype)) {
+      user.usedSpace.images -= fileToDelete.size;
+      user.usedSpace.images < 0 && (user.usedSpace.images = 0);
+    } else {
+      user.usedSpace.documents -= fileToDelete.size;
+      user.usedSpace.documents < 0 && (user.usedSpace.documents = 0);
+    }
+    user.save();
 
     return deleteResult;
   }
