@@ -67,7 +67,7 @@ export class FilesService {
       .exec();
 
     if (!fileToDelete) {
-      throw new Error('File not found');
+      throw new Error('Файл не знайдено');
     }
 
     const deleteResult = await this.fileModel
