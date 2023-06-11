@@ -16,8 +16,7 @@ export class UserEntity {
 
   @Prop({
     type: String,
-    default:
-      'https://static.wikia.nocookie.net/avatar/images/3/31/Korra_smiling.png/revision/latest/zoom-crop/width/500/height/500?cb=20200907192928',
+    default: '/img/default-avatar.png',
   })
   avatar: string;
 
