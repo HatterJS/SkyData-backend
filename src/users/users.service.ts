@@ -1,4 +1,4 @@
-import { ForbiddenException, Injectable } from '@nestjs/common';
+import { HttpException, HttpStatus, Injectable } from '@nestjs/common';
 import { CreateUserDto } from './dto/create-user.dto';
 import { InjectModel } from '@nestjs/mongoose';
 import { Model, ObjectId, Types } from 'mongoose';
@@ -56,8 +56,19 @@ export class UsersService {
 
   async deleteUser(_id: Types.ObjectId) {
     try {
+      const user = await this.userModel.findById(_id);
+
       const filesToDelete = await this.fileModel.find({ user: _id });
       const deleteFilesResult = await this.fileModel.deleteMany({ user: _id });
+
+      user.avatar !== 'default-avatar.webp' &&
+        fs.unlink(`${avatarDestination}/${user.avatar}`, (err) => {
+          if (err) {
+            console.error(`Failed to delete file "${user.avatar}": ${err}`);
+          } else {
+            console.log(`Successfully deleted file "${user.avatar}"`);
+          }
+        });
 
       filesToDelete.forEach((file) => {
         fs.unlink(`${destination}/${file.filename}`, (err) => {
@@ -91,7 +102,10 @@ export class UsersService {
       );
       return updateUser.avatar;
     } catch (err) {
-      throw new Error('Не вдалось змінити Avatar');
+      throw new HttpException(
+        'Під час видалення виникла помилка',
+        HttpStatus.INTERNAL_SERVER_ERROR,
+      );
     }
   }
 
@@ -110,7 +124,10 @@ export class UsersService {
       user.avatar = 'default-avatar.webp';
       user.save();
     } catch (err) {
-      throw new Error('Під час видалення виникла прмиока');
+      throw new HttpException(
+        'Під час видалення виникла помилка',
+        HttpStatus.INTERNAL_SERVER_ERROR,
+      );
     }
     return 'default-avatar.webp';
   }

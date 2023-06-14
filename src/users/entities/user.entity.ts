@@ -16,7 +16,7 @@ export class UserEntity {
 
   @Prop({
     type: String,
-    default: '/img/default-avatar.png',
+    default: 'default-avatar.webp',
   })
   avatar: string;
 

@@ -10,8 +10,6 @@ import {
   UploadedFile,
   ParseFilePipe,
   MaxFileSizeValidator,
-  ForbiddenException,
-  FileTypeValidator,
 } from '@nestjs/common';
 import { UsersService } from './users.service';
 import { ApiBearerAuth, ApiBody, ApiConsumes, ApiTags } from '@nestjs/swagger';
@@ -21,7 +19,6 @@ import { UserId } from 'src/decorators/user-id.decorator';
 import { ObjectId, Types } from 'mongoose';
 import { UpdateUserCommonDto, UpdateUserPassDto } from './dto/update-user.dto';
 import { imageFileFilter, userStorage } from './storage';
-import * as iconv from 'iconv-lite';
 
 @Controller('users')
 @ApiTags('users')
