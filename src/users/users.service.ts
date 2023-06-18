@@ -1,4 +1,9 @@
-import { HttpException, HttpStatus, Injectable } from '@nestjs/common';
+import {
+  ForbiddenException,
+  HttpException,
+  HttpStatus,
+  Injectable,
+} from '@nestjs/common';
 import { CreateUserDto } from './dto/create-user.dto';
 import { InjectModel } from '@nestjs/mongoose';
 import { Model, ObjectId, Types } from 'mongoose';
@@ -6,6 +11,7 @@ import { UserEntity, UserDocument } from './entities/user.entity';
 import { UpdateUserCommonDto, UpdateUserPassDto } from './dto/update-user.dto';
 import { FileDocument, FileEntity } from 'src/files/entities/file.entity';
 import * as fs from 'fs';
+import * as bcrypt from 'bcrypt';
 import { destination } from '../files/storage';
 import { avatarDestination } from './storage';
 
@@ -28,7 +34,19 @@ export class UsersService {
   }
 
   async create(dto: CreateUserDto) {
-    const createdUser = new this.userModel(dto);
+    const findUser = await this.findByEmail(dto.email);
+
+    if (findUser) {
+      throw new ForbiddenException(
+        'Користувач з таким email вже зареєстрований',
+      );
+    }
+
+    const password = dto.password;
+    const salt = await bcrypt.genSalt(10);
+    const hash = await bcrypt.hash(password, salt);
+
+    const createdUser = new this.userModel({ ...dto, password: hash });
     return createdUser.save();
   }
 
@@ -44,10 +62,14 @@ export class UsersService {
   }
 
   async updatePass(_id: Types.ObjectId, dto: UpdateUserPassDto) {
+    const password = dto.password;
+    const salt = await bcrypt.genSalt(10);
+    const hash = await bcrypt.hash(password, salt);
+
     const updateUser = await this.userModel.findByIdAndUpdate(
       _id,
       {
-        password: dto.password,
+        password: hash,
       },
       { new: true },
     );
@@ -87,7 +109,10 @@ export class UsersService {
         fileCount: deleteFilesResult?.deletedCount ?? 0,
       };
     } catch (err) {
-      throw new Error('Під час видалення виникли помилки');
+      throw new HttpException(
+        'Під час видалення виникла помилка',
+        HttpStatus.INTERNAL_SERVER_ERROR,
+      );
     }
   }
 
