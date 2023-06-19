@@ -10,15 +10,12 @@ import { MongooseModule } from '@nestjs/mongoose';
 @Module({
   imports: [
     ConfigModule.forRoot(),
-    MongooseModule.forRoot(
-      `mongodb://${process.env.DB_HOST}:${process.env.DB_PORT}/${process.env.DB_NAME}`,
-      {
-        auth: {
-          username: process.env.DB_USER,
-          password: process.env.DB_PASSWORD,
-        },
+    MongooseModule.forRoot(`${process.env.DB_HOST}/${process.env.DB_NAME}`, {
+      auth: {
+        username: process.env.DB_USER,
+        password: process.env.DB_PASSWORD,
       },
-    ),
+    }),
     UsersModule,
     FilesModule,
     AuthModule,
