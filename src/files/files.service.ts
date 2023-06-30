@@ -25,10 +25,15 @@ export class FilesService {
     if (fileType === FileType.PHOTOS) {
       findOptions.mimetype = { $regex: /^image/, $options: 'i' };
     }
-
-    if (fileType === FileType.NOPHOTOS) {
+    if (fileType === FileType.VIDEOS) {
+      findOptions.mimetype = { $regex: /^video/, $options: 'i' };
+    }
+    if (fileType === FileType.AUDIOS) {
+      findOptions.mimetype = { $regex: /^audio/, $options: 'i' };
+    }
+    if (fileType === FileType.DOCS) {
       findOptions.mimetype = {
-        $not: { $regex: /^image/, $options: 'i' },
+        $not: { $in: [/^image/, /^video/, /^audio/] },
       };
     }
     return this.fileModel.find(findOptions).exec();
@@ -48,8 +53,12 @@ export class FilesService {
     if (user.usedSpace.total > user.maxSize * 10 ** 9)
       throw new ForbiddenException('Ви перевищили доступний простір хмарки');
 
-    if (/^image/.test(file.mimetype)) {
-      user.usedSpace.images += file.size;
+    if (
+      /^image/.test(file.mimetype) ||
+      /^video/.test(file.mimetype) ||
+      /^audio/.test(file.mimetype)
+    ) {
+      user.usedSpace.media += file.size;
     } else {
       user.usedSpace.documents += file.size;
     }
@@ -90,9 +99,13 @@ export class FilesService {
     const user = await this.userModel.findById(userId);
     user.usedSpace.total -= fileToDelete.size;
     user.usedSpace.total < 0 && (user.usedSpace.total = 0);
-    if (/^image/.test(fileToDelete.mimetype)) {
-      user.usedSpace.images -= fileToDelete.size;
-      user.usedSpace.images < 0 && (user.usedSpace.images = 0);
+    if (
+      /^image/.test(fileToDelete.mimetype) ||
+      /^video/.test(fileToDelete.mimetype) ||
+      /^audio/.test(fileToDelete.mimetype)
+    ) {
+      user.usedSpace.media -= fileToDelete.size;
+      user.usedSpace.media < 0 && (user.usedSpace.media = 0);
     } else {
       user.usedSpace.documents -= fileToDelete.size;
       user.usedSpace.documents < 0 && (user.usedSpace.documents = 0);

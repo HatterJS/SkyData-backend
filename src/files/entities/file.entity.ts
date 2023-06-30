@@ -4,7 +4,9 @@ import { UserEntity, UserDocument } from 'src/users/entities/user.entity';
 
 export enum FileType {
   PHOTOS = 'photos',
-  NOPHOTOS = 'nophotos',
+  VIDEOS = 'videos',
+  AUDIOS = 'audios',
+  DOCS = 'docs',
 }
 
 @Schema({ collection: 'files' })
@@ -23,6 +25,12 @@ export class FileEntity extends Document {
 
   @Prop({ type: Types.ObjectId, ref: UserEntity.name })
   user: UserDocument;
+
+  @Prop({ type: Date, default: Date.now })
+  createdAt: Date;
+
+  @Prop({ type: Date, default: Date.now })
+  updatedAt: Date;
 }
 
 export type FileDocument = FileEntity & Document;

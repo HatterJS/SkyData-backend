@@ -23,7 +23,7 @@ export class UserEntity {
   @Prop({ type: String, default: 'start' })
   tariffPlan: string;
 
-  @Prop({ type: Number, default: 1 })
+  @Prop({ type: Number, default: 10 })
   maxSize: number;
 
   @Prop({ type: Boolean, default: false })
@@ -31,18 +31,18 @@ export class UserEntity {
 
   @Prop({
     type: {
-      images: { type: Number, default: 0 },
+      media: { type: Number, default: 0 },
       documents: { type: Number, default: 0 },
       total: { type: Number, default: 0 },
     },
     default: {
-      images: 0,
+      media: 0,
       documents: 0,
       total: 0,
     },
   })
   usedSpace: {
-    images: number;
+    media: number;
     documents: number;
     total: number;
   };
