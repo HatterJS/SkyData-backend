@@ -7,6 +7,7 @@ import { LocalStrategy } from './strategies/local.strategy';
 import { JwtModule } from '@nestjs/jwt';
 import { ConfigModule, ConfigService } from '@nestjs/config';
 import { JwtStrategy } from './strategies/jwt.strategy';
+import { MailerModule } from '@nestjs-modules/mailer';
 
 @Module({
   imports: [
@@ -22,6 +23,21 @@ import { JwtStrategy } from './strategies/jwt.strategy';
     }),
     UsersModule,
     PassportModule,
+    MailerModule.forRootAsync({
+      imports: [ConfigModule],
+      inject: [ConfigService],
+      useFactory: async (configService: ConfigService) => {
+        return {
+          transport: {
+            service: 'gmail',
+            auth: {
+              user: configService.get('GMAIL_USER'),
+              pass: configService.get('GMAIL_PASS'),
+            },
+          },
+        };
+      },
+    }),
   ],
   providers: [AuthService, LocalStrategy, JwtStrategy],
   controllers: [AuthController],
