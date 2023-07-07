@@ -50,7 +50,7 @@ export class FilesService {
     //increase size of used space
     const user = await this.userModel.findById(userId);
     user.usedSpace.total += file.size;
-    if (user.usedSpace.total > user.maxSize * 10 ** 9)
+    if (user.usedSpace.total > user.maxSize * 10 ** 6)
       throw new ForbiddenException('Ви перевищили доступний простір хмарки');
 
     if (

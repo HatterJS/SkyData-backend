@@ -50,6 +50,18 @@ export class UsersService {
     return createdUser.save();
   }
 
+  async confirmEmail(id: string) {
+    const userData = await this.userModel.findByIdAndUpdate(
+      id,
+      {
+        isConfirmed: true,
+      },
+      { new: true },
+    );
+    userData.save();
+    return userData.isConfirmed;
+  }
+
   async updateCommon(_id: Types.ObjectId, dto: UpdateUserCommonDto) {
     const updateUser = await this.userModel.findByIdAndUpdate(
       _id,

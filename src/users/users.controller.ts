@@ -32,6 +32,11 @@ export class UsersController {
     return this.usersService.findById(id.toString());
   }
 
+  @Patch('/confirmation')
+  confirmEmail(@UserId() id: Types.ObjectId) {
+    return this.usersService.confirmEmail(id.toString());
+  }
+
   @Patch('/updatecommon')
   updateUserData(
     @UserId() id: Types.ObjectId,

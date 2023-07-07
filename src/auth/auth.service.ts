@@ -33,7 +33,7 @@ export class AuthService {
     const token = this.jwtService.sign({ _id: userData._id });
 
     // Send confirmation letter
-    const confirmationLink = `https://skydata.space/confirm-email?token=${token}`;
+    const confirmationLink = `https://skydata.space/profile/confirm-email?token=${token}`;
     const mailOptions = {
       to: userData.email,
       subject: 'Підтвердження реєстрації.',
