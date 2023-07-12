@@ -50,4 +50,24 @@ export class AuthService {
       token: this.jwtService.sign({ _id: userWithDoc._doc._id }),
     };
   }
+
+  async resendMail(id: string) {
+    try {
+      const userData = await this.usersService.findById(id);
+      const token = this.jwtService.sign({ _id: userData._id });
+
+      // Send confirmation letter
+      const confirmationLink = `https://skydata.space/profile/confirm-email?token=${token}`;
+      const mailOptions = {
+        to: userData.email,
+        subject: 'Підтвердження реєстрації.',
+        html: `<p>Шановний(а) ${userData.fullName}!</p><p>Вітаємо на хмарному сервісі <b>SkyData!</b> Ваш обліковий запис було створено успішно. Щоб підтвердити свою реєстрацію та активувати обліковий запис, будь ласка, натисніть <a href=${confirmationLink}>ПІДТВЕРДИТИ.</a></p><p></p><p>Якщо ви не реєструвались на нашому сайті, ігноруйте цей лист. Можливо, хтось випадково ввів вашу електронну адресу.</p><p></p><p>Якщо у вас виникли будь-які питання або проблеми з вашим обліковим записом, опишіть обставини у зворотньому листі або через <a href="https://t.me/chaosChronicle_bot">Telegram</a>.</p><p></p><p>Дякуємо,<br>Команда SkyData.space</p>`,
+      };
+      await this.mailerService.sendMail(mailOptions);
+
+      return `На Ваш E-mail: ${userData.email} направлено лист підтвердження.`;
+    } catch (err) {
+      return 'Не вдалось відправити лист підтвердження.';
+    }
+  }
 }
